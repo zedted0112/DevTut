@@ -1,59 +1,19 @@
 import { useState } from 'react'
-import CodeEditor from './CodeEditor'
+import LessonInterface from './LessonInterface'
 
 const LessonModal = ({ lesson, onClose }) => {
-  const [activeTab, setActiveTab] = useState('solution')
+  const [showNewInterface, setShowNewInterface] = useState(true)
 
-  const tabs = [
-    { id: 'solution', label: '✏️ solution.js', icon: '✏️' },
-    { id: 'solution-view', label: '💡 solution.js', icon: '💡' },
-    { id: 'test', label: '🧪 test.js', icon: '🧪' }
-  ]
-
-  const getTabContent = () => {
-    switch (activeTab) {
-      case 'solution':
-        return lesson.challenge?.starterCode || '// Write your solution here...'
-      case 'solution-view':
-        return lesson.challenge?.solution || '// No solution available'
-      case 'test':
-        return generateTestCode()
-      default:
-        return '// Select a tab to view content'
-    }
+  // Toggle between old and new interface
+  const toggleInterface = () => {
+    setShowNewInterface(!showNewInterface)
   }
 
-  const generateTestCode = () => {
-    if (lesson.challenge?.tests) {
-      return lesson.challenge.tests.map(test => 
-        `// Test: ${test.description}\n// Expected: ${test.expected}\n// Status: ${test.passed ? 'PASS' : 'FAIL'}\n`
-      ).join('\n')
-    }
-    return `// Sample Test Cases for: ${lesson.challenge?.description || 'Challenge'}
-
-// Test 1: Basic functionality
-console.log('Test 1: Basic functionality');
-// TODO: Add your test logic here
-
-// Test 2: Edge cases
-console.log('Test 2: Edge cases');
-// TODO: Add edge case testing
-
-// Test 3: Error handling
-console.log('Test 3: Error handling');
-// TODO: Add error case testing
-
-// Run tests
-console.log('\\nRunning tests...');
-// TODO: Execute your tests here`
+  if (showNewInterface) {
+    return <LessonInterface lesson={lesson} onClose={onClose} />
   }
 
-  const handleShowSolution = () => {
-    setActiveTab('solution-view')
-  }
-
-  const isReadOnly = activeTab !== 'solution'
-
+  // Fallback to old interface if needed
   return (
     <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
       <div className="bg-white rounded-3xl shadow-2xl w-full max-w-7xl h-[90vh] flex flex-col animate-slide-up">
@@ -67,12 +27,20 @@ console.log('\\nRunning tests...');
                 <h2 className="text-3xl font-bold mb-2">{lesson.title}</h2>
                 <p className="text-white/90">Master the fundamentals step by step</p>
               </div>
-              <button
-                onClick={onClose}
-                className="bg-white/20 hover:bg-white/30 text-white w-12 h-12 rounded-full flex items-center justify-center text-xl transition-colors duration-200 hover:scale-110"
-              >
-                ×
-              </button>
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={toggleInterface}
+                  className="bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-lg text-sm transition-colors duration-200"
+                >
+                  🔄 Toggle Interface
+                </button>
+                <button
+                  onClick={onClose}
+                  className="bg-white/20 hover:bg-white/30 text-white w-12 h-12 rounded-full flex items-center justify-center text-xl transition-colors duration-200 hover:scale-110"
+                >
+                  ×
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -84,35 +52,30 @@ console.log('\\nRunning tests...');
             {/* Tabs */}
             <div className="bg-dark-800 border-b border-dark-700 px-6 py-3">
               <div className="flex gap-2">
-                {tabs.map((tab) => (
-                  <button
-                    key={tab.id}
-                    onClick={() => setActiveTab(tab.id)}
-                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
-                      activeTab === tab.id
-                        ? 'bg-primary-600 text-white shadow-lg'
-                        : 'text-dark-300 hover:text-white hover:bg-dark-700'
-                    }`}
-                  >
-                    {tab.label}
-                  </button>
-                ))}
-                
-                {isReadOnly && (
-                  <span className="ml-auto bg-yellow-500 text-white px-3 py-1 rounded-full text-xs font-bold">
-                    READ-ONLY
-                  </span>
-                )}
+                <div className="px-4 py-2 rounded-lg text-sm font-medium bg-primary-600 text-white shadow-lg">
+                  ✏️ solution.js
+                </div>
+                <div className="px-4 py-2 rounded-lg text-sm font-medium text-dark-300 hover:text-white hover:bg-dark-700">
+                  💡 solution.js
+                </div>
+                <div className="px-4 py-2 rounded-lg text-sm font-medium text-dark-300 hover:text-white hover:bg-dark-700">
+                  🧪 test.js
+                </div>
               </div>
             </div>
 
             {/* Editor */}
             <div className="flex-1 p-6">
-              <CodeEditor
-                value={getTabContent()}
-                readOnly={isReadOnly}
-                language="javascript"
-              />
+              <div className="w-full h-full">
+                <textarea
+                  defaultValue="// Write your solution here..."
+                  className="w-full h-full font-mono text-sm bg-dark-800 text-dark-100 p-6 rounded-lg border border-dark-600 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 resize-none outline-none"
+                  style={{ 
+                    fontFamily: 'JetBrains Mono, Fira Code, Monaco, Consolas, monospace',
+                    lineHeight: '1.6'
+                  }}
+                />
+              </div>
             </div>
           </div>
 
@@ -160,7 +123,7 @@ console.log('\\nRunning tests...');
                     ▶️ Run Code
                   </button>
                   <button 
-                    onClick={handleShowSolution}
+                    onClick={toggleInterface}
                     className="btn-secondary flex-1"
                   >
                     💡 Show Solution
