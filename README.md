@@ -1,11 +1,11 @@
-# 🚀 DevForge Learning Platform
+# 🚀 DevTut - Modern Learning Platform
 
 A modern learning platform for mastering Node.js microservices, built with a clean monorepo architecture.
 
 ## 📁 Project Structure
 
 ```
-devforge-platform/
+DevTut/
 ├── apps/
 │   ├── legacy/          # Original vanilla JS app (working)
 │   └── react/           # Modern React + Tailwind app

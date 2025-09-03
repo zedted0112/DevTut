@@ -1,7 +1,7 @@
 {
-  "name": "devforge-platform",
+  "name": "devtut",
   "version": "1.0.0",
-  "description": "DevForge Learning Platform - Monorepo",
+  "description": "DevTut - Modern Learning Platform for Developers",
   "private": true,
   "workspaces": [
     "apps/*",
@@ -16,12 +16,13 @@
     "clean": "rm -rf node_modules apps/*/node_modules packages/*/node_modules"
   },
   "keywords": [
-    "devforge",
+    "devtut",
     "learning",
     "nodejs",
     "react",
-    "monorepo"
+    "monorepo",
+    "tutorials"
   ],
-  "author": "DevForge Team",
+  "author": "DevTut Team",
   "license": "MIT"
 }
