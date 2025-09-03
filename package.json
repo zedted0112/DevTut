@@ -1,0 +1,27 @@
+{
+  "name": "devforge-platform",
+  "version": "1.0.0",
+  "description": "DevForge Learning Platform - Monorepo",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev:legacy": "cd apps/legacy && npm run dev",
+    "dev:react": "cd apps/react && npm run dev",
+    "build:react": "cd apps/react && npm run build",
+    "install:all": "npm install && npm run install:workspaces",
+    "install:workspaces": "cd apps/legacy && npm install && cd ../react && npm install",
+    "clean": "rm -rf node_modules apps/*/node_modules packages/*/node_modules"
+  },
+  "keywords": [
+    "devforge",
+    "learning",
+    "nodejs",
+    "react",
+    "monorepo"
+  ],
+  "author": "DevForge Team",
+  "license": "MIT"
+}

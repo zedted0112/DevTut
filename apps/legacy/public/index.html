@@ -1,0 +1,2405 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>DevForge Learning Lab - Interactive Node.js Course</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/codemirror.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/mode/javascript/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/theme/monokai.min.js"></script>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/codemirror.min.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/theme/monokai.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.5);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 60px;
+            padding: 50px 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -20%;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+
+        .header::after {
+            content: '';
+            position: absolute;
+            bottom: -30%;
+            left: -15%;
+            width: 200px;
+            height: 200px;
+            background: radial-gradient(circle, rgba(255,255,255,0.08) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+
+        .header h1 {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            text-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            background: linear-gradient(135deg, #ffffff, #e0f2fe, #ffffff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            position: relative;
+            z-index: 1;
+        }
+
+        .header p {
+            font-size: 1.4rem;
+            opacity: 0.95;
+            font-weight: 500;
+            max-width: 700px;
+            margin: 0 auto;
+            line-height: 1.6;
+            position: relative;
+            z-index: 1;
+        }
+
+        .header-stats {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin-top: 30px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .stat-item {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            padding: 15px 25px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            text-align: center;
+            min-width: 120px;
+        }
+
+        .stat-number {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            font-weight: 500;
+        }
+
+        .modules-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+            gap: 25px;
+            margin-bottom: 50px;
+        }
+
+        .module-card {
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(15px);
+            border-radius: 24px;
+            padding: 35px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+            border: 1px solid rgba(226, 232, 240, 0.8);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .module-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, #667eea, #764ba2, #667eea);
+            transform: scaleX(0);
+            transition: transform 0.4s ease;
+        }
+
+        .module-card::after {
+            content: '';
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+            border-radius: 50%;
+            opacity: 0;
+            transition: all 0.4s ease;
+        }
+
+        .module-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 30px 60px rgba(0,0,0,0.12);
+            background: rgba(255, 255, 255, 1);
+        }
+
+        .module-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .module-card:hover::after {
+            opacity: 1;
+            transform: scale(1.2);
+        }
+
+        .module-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .module-title {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: #1a202c;
+            margin-bottom: 8px;
+            line-height: 1.3;
+        }
+
+        .difficulty {
+            padding: 6px 16px;
+            border-radius: 25px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .difficulty.beginner { 
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+        }
+        .difficulty.intermediate { 
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: white;
+            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+        }
+        .difficulty.advanced { 
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: white;
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+        }
+
+        .module-description {
+            color: #4a5568;
+            margin-bottom: 20px;
+            line-height: 1.6;
+            font-size: 1rem;
+        }
+
+        .module-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9rem;
+            color: #718096;
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(226, 232, 240, 0.6);
+        }
+
+        .module-progress {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .progress-circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: conic-gradient(#667eea 0deg, #667eea 180deg, #e2e8f0 180deg, #e2e8f0 360deg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .progress-circle::before {
+            content: attr(data-progress);
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: #667eea;
+        }
+
+        .progress-circle::after {
+            content: '';
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            background: white;
+            border-radius: 50%;
+        }
+
+        .topics {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .topic-tag {
+            background: linear-gradient(135deg, #f7fafc, #edf2f7);
+            color: #4a5568;
+            padding: 6px 12px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            border: 1px solid rgba(226, 232, 240, 0.8);
+            transition: all 0.2s ease;
+        }
+
+        .topic-tag:hover {
+            background: linear-gradient(135deg, #edf2f7, #e2e8f0);
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .lesson-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.85);
+            backdrop-filter: blur(8px);
+            z-index: 1000;
+            overflow-y: auto;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .lesson-content {
+            background: white;
+            margin: 40px auto;
+            max-width: 1000px;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 25px 80px rgba(0,0,0,0.25);
+            transform: translateY(20px);
+            animation: slideUp 0.4s ease-out forwards;
+        }
+
+        @keyframes slideUp {
+            to { transform: translateY(0); }
+        }
+
+        .lesson-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 35px 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .lesson-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -20%;
+            width: 200px;
+            height: 200px;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+
+        .lesson-header h2 {
+            font-size: 2.4rem;
+            font-weight: 700;
+            margin: 0;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            position: relative;
+            z-index: 1;
+        }
+
+        .lesson-header-subtitle {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            margin-top: 8px;
+            font-weight: 400;
+            position: relative;
+            z-index: 1;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 25px;
+            right: 25px;
+            background: rgba(255,255,255,0.15);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 20px;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .close-btn:hover {
+            background: rgba(255,255,255,0.25);
+            transform: scale(1.1);
+        }
+
+        .lesson-body {
+            padding: 0;
+            background: #f8fafc;
+            min-height: 600px;
+        }
+
+        .lesson-content-wrapper {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0;
+            min-height: 600px;
+            background: #f8fafc;
+        }
+
+        .lesson-main-content {
+            background: white;
+            padding: 0;
+            border-right: 1px solid #e2e8f0;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 2px 0 8px rgba(0,0,0,0.05);
+        }
+
+        .lesson-sidebar {
+            background: #f8fafc;
+            padding: 0;
+            border-left: 1px solid #e2e8f0;
+            overflow-y: auto;
+            box-shadow: -2px 0 8px rgba(0,0,0,0.05);
+        }
+
+        .lesson-main-content {
+            background: white;
+            padding: 0;
+            border-right: 1px solid #e2e8f0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .lesson-sidebar {
+            background: #f8fafc;
+            padding: 0;
+            border-left: 1px solid #e2e8f0;
+            overflow-y: auto;
+        }
+
+        .code-editor-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: #1e1e1e;
+        }
+
+        .editor-header {
+            background: #2d2d30;
+            padding: 12px 20px;
+            border-bottom: 1px solid #3e3e42;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .file-tab {
+            background: #2d2d30;
+            color: #cccccc;
+            padding: 10px 18px;
+            border-radius: 6px 6px 0 0;
+            font-size: 13px;
+            cursor: pointer;
+            border: 1px solid transparent;
+            border-bottom: none;
+            transition: all 0.2s ease;
+            position: relative;
+            font-weight: 500;
+        }
+
+        .file-tab:hover {
+            background: #3a3a3d;
+            color: #ffffff;
+        }
+
+        .file-tab.active {
+            background: #1e1e1e;
+            color: #ffffff;
+            border-color: #667eea;
+            border-bottom: 2px solid #667eea;
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
+        }
+
+        .file-tab.active::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            border-radius: 6px 6px 0 0;
+        }
+
+        /* Read-only indicator */
+        .read-only-indicator {
+            margin-left: auto;
+            background: #f59e0b;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 500;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .read-only-indicator.show {
+            opacity: 1;
+        }
+
+        .editor-content {
+            flex: 1;
+            padding: 20px;
+            background: #1e1e1e;
+            color: #d4d4d4;
+        }
+
+        .content-section {
+            margin-bottom: 35px;
+            background: white;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+            overflow: hidden;
+        }
+
+        .content-section-header {
+            background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+            padding: 18px 20px;
+            border-bottom: 1px solid #e2e8f0;
+            font-weight: 600;
+            color: #1f2937;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .content-section-header::before {
+            content: '';
+            width: 4px;
+            height: 20px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 2px;
+        }
+
+        .content-section-body {
+            padding: 25px;
+        }
+
+        .section-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-title .icon {
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border-radius: 6px;
+            font-size: 14px;
+            box-shadow: 0 2px 4px rgba(102, 126, 234, 0.2);
+        }
+
+        .code-section {
+            background: white;
+            border-radius: 8px;
+            padding: 0;
+            margin: 0 0 25px 0;
+            border: 1px solid #e2e8f0;
+            overflow: hidden;
+        }
+
+        .code-section-content {
+            padding: 20px;
+        }
+
+        .code-block {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
+            font-size: 13px;
+            line-height: 1.6;
+            overflow-x: auto;
+            border: 1px solid #334155;
+            position: relative;
+            margin: 15px 0;
+        }
+
+        .code-block::before {
+            content: '💻';
+            position: absolute;
+            top: -10px;
+            left: 15px;
+            background: #667eea;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+
+        .code-block code {
+            display: block;
+            white-space: pre;
+            overflow-x: auto;
+        }
+
+        .code-section h4 {
+            margin-bottom: 20px;
+            color: #1e293b;
+            font-size: 1.4rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 0;
+            background: none;
+            border-radius: 0;
+            border-left: none;
+            box-shadow: none;
+        }
+
+        .code-block {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.5;
+            overflow-x: auto;
+        }
+
+        .challenge-section {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 0;
+            margin: 0 0 25px 0;
+            overflow: hidden;
+        }
+
+        .challenge-content {
+            padding: 20px;
+        }
+
+        .challenge-description {
+            color: #4b5563;
+            line-height: 1.6;
+            margin-bottom: 25px;
+            font-size: 1rem;
+            background: #f8fafc;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid #f59e0b;
+        }
+
+        .challenge-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .challenge-actions .btn {
+            flex: 1;
+            min-width: 120px;
+        }
+
+        .challenge-section h4 {
+            color: #1e293b;
+            margin-bottom: 20px;
+            font-size: 1.4rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 0;
+            background: none;
+            border-radius: 0;
+            border-left: none;
+            box-shadow: none;
+        }
+
+        .code-editor {
+            width: 100%;
+            height: 100%;
+            font-family: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
+            font-size: 14px;
+            padding: 0;
+            border: none;
+            border-radius: 0;
+            resize: none;
+            margin: 0;
+            background: transparent;
+            color: transparent;
+            line-height: 1.6;
+            outline: none;
+            box-shadow: none;
+            white-space: pre;
+            overflow-wrap: normal;
+            overflow-x: auto;
+            caret-color: transparent;
+        }
+
+        .code-editor::placeholder {
+            color: transparent;
+        }
+
+        .editor-wrapper {
+            position: relative;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        /* CodeMirror Customization */
+        .CodeMirror {
+            height: 100% !important;
+            font-family: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace !important;
+            font-size: 14px !important;
+            line-height: 1.6 !important;
+        }
+
+        .CodeMirror-gutters {
+            background: #252526 !important;
+            border-right: 1px solid #3e3e42 !important;
+        }
+
+        .CodeMirror-linenumber {
+            color: #858585 !important;
+            font-size: 13px !important;
+        }
+
+        .CodeMirror-cursor {
+            border-left: 2px solid #ffffff !important;
+        }
+
+        .CodeMirror-selected {
+            background: #3a3a3a !important;
+        }
+
+        .CodeMirror-focused .CodeMirror-selected {
+            background: #4a4a4a !important;
+        }
+
+        .CodeMirror-matchingbracket {
+            color: #ffd700 !important;
+            font-weight: bold !important;
+        }
+
+        .CodeMirror-nonmatchingbracket {
+            color: #ff6b6b !important;
+        }
+
+        /* Custom scrollbar for CodeMirror */
+        .CodeMirror-scrollbar-filler {
+            background: #1e1e1e !important;
+        }
+
+        .CodeMirror-simplescroll-horizontal div,
+        .CodeMirror-simplescroll-vertical div {
+            background: #4a4a4a !important;
+            border-radius: 3px !important;
+        }
+
+        .btn-secondary {
+            background: #6b7280;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .btn-secondary:hover {
+            background: #4b5563;
+            transform: translateY(-1px);
+        }
+
+        .btn-video {
+            background: #10b981;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .btn-video:hover {
+            background: #059669;
+            transform: translateY(-1px);
+        }
+
+        .video-placeholder-content {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .video-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            opacity: 0.7;
+        }
+
+        .video-placeholder h5 {
+            color: #374151;
+            margin-bottom: 10px;
+            font-size: 1.2rem;
+        }
+
+        .video-placeholder p {
+            color: #6b7280;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 14px 28px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .btn:active {
+            transform: translateY(-1px);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .test-results {
+            margin-top: 20px;
+            padding: 20px;
+            border-radius: 8px;
+        }
+
+        .test-results.success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+
+        .test-results.error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+
+        .test-item {
+            display: flex;
+            align-items: center;
+            margin: 10px 0;
+            padding: 10px;
+            background: rgba(255,255,255,0.5);
+            border-radius: 5px;
+        }
+
+        .test-status {
+            margin-right: 10px;
+            font-size: 18px;
+        }
+
+        .test-status.passed { color: #28a745; }
+        .test-status.failed { color: #dc3545; }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .score-section {
+            background: rgba(255,255,255,0.8);
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+
+        .score-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 8px 0;
+            padding: 8px;
+            background: rgba(255,255,255,0.5);
+            border-radius: 5px;
+        }
+
+        .score-label {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .score-value {
+            font-weight: bold;
+            color: #667eea;
+            font-size: 1.1em;
+        }
+
+        .badges-section {
+            margin: 15px 0;
+        }
+
+        .badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            margin: 5px;
+            font-size: 0.9em;
+            font-weight: 600;
+        }
+
+        .tests-section {
+            margin: 15px 0;
+        }
+
+        .test-details {
+            flex: 1;
+            margin-left: 10px;
+        }
+
+        .test-points {
+            background: #28a745;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            margin-left: 10px;
+        }
+
+        .test-feedback {
+            margin-top: 5px;
+            font-style: italic;
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .next-challenge {
+            background: rgba(255,255,255,0.8);
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            text-align: center;
+        }
+
+        .video-section {
+            margin-bottom: 30px;
+        }
+
+        .video-section h4 {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 0;
+            background: none;
+            border-radius: 0;
+            border-left: none;
+            box-shadow: none;
+        }
+
+        .video-container {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            transition: all 0.3s ease;
+        }
+
+        .video-container:hover {
+            box-shadow: 0 6px 20px rgba(0,0,0,0.12);
+            transform: translateY(-2px);
+        }
+
+        .video-player {
+            background: #000;
+            border-radius: 8px 8px 0 0;
+            overflow: hidden;
+        }
+
+        .video-iframe-container {
+            position: relative;
+            width: 100%;
+            background: #000;
+            border-radius: 8px 8px 0 0;
+        }
+
+        .video-player iframe {
+            border-radius: 8px 8px 0 0;
+            display: block;
+            width: 100%;
+            height: 315px;
+            border: none;
+        }
+
+        .video-controls {
+            padding: 15px 20px;
+            background: #f8fafc;
+            display: flex;
+            gap: 10px;
+            justify-content: flex-start;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .video-placeholder {
+            padding: 40px 20px;
+            text-align: center;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        }
+
+        .video-placeholder-content {
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        .video-icon {
+            font-size: 4rem;
+            margin-bottom: 15px;
+            opacity: 0.7;
+        }
+
+        .video-placeholder h5 {
+            color: #495057;
+            margin-bottom: 10px;
+            font-size: 1.3rem;
+        }
+
+        .video-placeholder p {
+            color: #6c757d;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+
+        .btn-video {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            font-size: 0.95rem;
+            padding: 10px 20px;
+        }
+
+        .btn-video:hover {
+            background: linear-gradient(135deg, #218838 0%, #1ea085 100%);
+        }
+
+        .video-player {
+            background: #000;
+            border-radius: 12px 12px 0 0;
+            overflow: hidden;
+        }
+
+        .video-iframe-container {
+            position: relative;
+            width: 100%;
+            background: #000;
+            border-radius: 12px 12px 0 0;
+        }
+
+        .video-player iframe {
+            border-radius: 12px 12px 0 0;
+            display: block;
+            width: 100%;
+            height: 315px;
+            border: none;
+        }
+
+        .video-loading {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 315px;
+            background: #000;
+            color: white;
+        }
+
+        .video-loading .spinner {
+            border: 4px solid #333;
+            border-top: 4px solid #fff;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin-bottom: 15px;
+        }
+
+        .video-loading p {
+            margin: 0;
+            font-size: 1.1rem;
+            opacity: 0.8;
+        }
+
+        .video-controls {
+            padding: 15px;
+            background: rgba(255,255,255,0.95);
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            border-radius: 0 0 12px 12px;
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+            font-size: 0.9rem;
+            padding: 8px 16px;
+        }
+
+        .btn-secondary:hover {
+            background: linear-gradient(135deg, #5a6268 0%, #343a40 100%);
+        }
+
+        /* Notification styles */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 10000;
+            max-width: 400px;
+            animation: slideInRight 0.3s ease-out;
+        }
+
+        .notification-content {
+            background: white;
+            border-radius: 8px;
+            padding: 15px 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 15px;
+        }
+
+        .notification-success {
+            border-left: 4px solid #28a745;
+        }
+
+        .notification-error {
+            border-left: 4px solid #dc3545;
+        }
+
+        .notification-info {
+            border-left: 4px solid #17a2b8;
+        }
+
+        .notification-message {
+            flex: 1;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .notification-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #999;
+            padding: 0;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: background-color 0.2s;
+        }
+
+        .notification-close:hover {
+            background-color: #f8f9fa;
+            color: #666;
+        }
+
+        @keyframes slideInRight {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .feedback-section {
+            background: rgba(255,255,255,0.8);
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e9ecef;
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            transition: width 0.3s ease;
+        }
+
+        @media (max-width: 768px) {
+            .container { 
+                padding: 15px; 
+            }
+            .header { 
+                padding: 30px 0; 
+                margin-bottom: 30px; 
+            }
+            .header h1 { 
+                font-size: 2.5rem; 
+            }
+            .header p { 
+                font-size: 1.1rem; 
+                padding: 0 20px; 
+            }
+            .modules-grid { 
+                grid-template-columns: 1fr; 
+                gap: 20px; 
+            }
+            .module-card { 
+                padding: 25px; 
+            }
+            .lesson-content { 
+                margin: 15px; 
+                border-radius: 15px; 
+            }
+            .lesson-header { 
+                padding: 25px; 
+            }
+            .lesson-header h2 { 
+                font-size: 1.8rem; 
+            }
+            .lesson-body { 
+                padding: 25px; 
+            }
+            .code-section, .challenge-section { 
+                padding: 20px; 
+                margin: 20px 0; 
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header h1 { 
+                font-size: 2rem; 
+            }
+            .module-card { 
+                padding: 20px; 
+            }
+            .btn { 
+                padding: 12px 20px; 
+                font-size: 0.9rem; 
+            }
+        }
+
+        /* Loading animation for better UX */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .loading-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .loading-content {
+            background: white;
+            padding: 30px;
+            border-radius: 16px;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        .loading-content h3 {
+            margin-bottom: 20px;
+            color: #2d3748;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 DevForge Learning Lab</h1>
+            <p>Master Node.js by building a real microservices project step by step</p>
+            <div class="header-stats">
+                <div class="stat-item">
+                    <div class="stat-number">12</div>
+                    <div class="stat-label">Modules</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">48</div>
+                    <div class="stat-label">Lessons</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">15K+</div>
+                    <div class="stat-label">Students</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modules-grid" id="modulesGrid">
+            <!-- Modules will be loaded here -->
+        </div>
+    </div>
+
+    <!-- Lesson Modal -->
+    <div class="lesson-modal" id="lessonModal">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2 id="lessonTitle">Lesson Title</h2>
+                <div class="lesson-header-subtitle" id="lessonSubtitle">Master the fundamentals step by step</div>
+                <button class="close-btn" id="closeLessonBtn">&times;</button>
+            </div>
+            <div class="lesson-body" id="lessonBody">
+                <!-- Lesson content will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentLesson = null;
+        let currentModule = null;
+
+        // Load modules on page load
+        document.addEventListener('DOMContentLoaded', loadModules);
+
+        async function loadModules() {
+            try {
+                const response = await fetch('/api/modules');
+                const modules = await response.json();
+                displayModules(modules);
+            } catch (error) {
+                console.error('Error loading modules:', error);
+            }
+        }
+
+        function displayModules(modules) {
+            const grid = document.getElementById('modulesGrid');
+            grid.innerHTML = '';
+
+            modules.forEach(module => {
+                const card = createModuleCard(module);
+                grid.appendChild(card);
+            });
+        }
+
+        function createModuleCard(module) {
+            const card = document.createElement('div');
+            card.className = 'module-card';
+            card.onclick = () => openModule(module);
+
+            const topics = module.topics.map(topic => 
+                `<span class="topic-tag">${topic}</span>`
+            ).join('');
+
+            // Calculate progress (random for demo, in real app this would come from user data)
+            const progress = Math.floor(Math.random() * 100);
+            
+            card.innerHTML = `
+                <div class="module-header">
+                    <h3 class="module-title">${module.title}</h3>
+                    <span class="difficulty ${module.difficulty.toLowerCase()}">${module.difficulty}</span>
+                </div>
+                <p class="module-description">${module.description}</p>
+                <div class="topics">${topics}</div>
+                <div class="module-meta">
+                    <div class="module-progress">
+                        <div class="progress-circle" data-progress="${progress}%"></div>
+                        <span>${progress}% Complete</span>
+                    </div>
+                    <div style="text-align: right;">
+                        <div>⏱️ ${module.duration}</div>
+                        <div>📚 ${module.lessons.length} lessons</div>
+                    </div>
+                </div>
+            `;
+
+            return card;
+        }
+
+        function openModule(module) {
+            currentModule = module;
+            // For now, open the first lesson
+            if (module.lessons.length > 0) {
+                openLessonWithVideo(module.lessons[0]);
+            }
+        }
+
+        async function openLesson(lesson) {
+            currentLesson = lesson;
+            
+            document.getElementById('lessonTitle').textContent = lesson.title;
+            document.getElementById('lessonBody').innerHTML = createLessonContent(lesson);
+            
+            // Add event listeners to buttons after content is created
+            if (lesson.challenge) {
+                const runCodeBtn = document.getElementById('runCodeBtn');
+                const showSolutionBtn = document.getElementById('showSolutionBtn');
+                
+                if (runCodeBtn) {
+                    runCodeBtn.addEventListener('click', runCode);
+                }
+                
+                if (showSolutionBtn) {
+                    showSolutionBtn.addEventListener('click', showSolution);
+                }
+            }
+            
+            // Add event listener to close button
+            const closeBtn = document.getElementById('closeLessonBtn');
+            if (closeBtn) {
+                closeBtn.addEventListener('click', closeLesson);
+            }
+            
+            // Add video functionality event listeners after a short delay to ensure DOM is ready
+            setTimeout(() => {
+                setupVideoFunctionality();
+            }, 100);
+            
+            document.getElementById('lessonModal').style.display = 'block';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function createLessonContent(lesson) {
+            let content = `
+                <div class="lesson-content-wrapper">
+                    <div class="lesson-main-content">
+                        <div class="code-editor-container">
+                            <div class="editor-header">
+                                <div class="file-tab active" data-tab="solution">✏️ solution.js</div>
+                                <div class="file-tab" data-tab="solution-view">💡 solution.js</div>
+                                <div class="file-tab" data-tab="test">🧪 test.js</div>
+                                <div class="read-only-indicator" id="readOnlyIndicator">READ-ONLY</div>
+                            </div>
+                            <div class="editor-content">
+                                <div class="editor-wrapper">
+                                    <textarea class="code-editor" id="codeEditor" placeholder="// Write your solution here...">${getInitialCode(lesson)}</textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="lesson-sidebar">
+                        <div class="content-section">
+                            <div class="content-section-header">
+                                <span class="section-title">
+                                    <span class="icon">📖</span>
+                                    Problem Description
+                                </span>
+                            </div>
+                            <div class="content-section-body">
+                                <p style="color: #4b5563; line-height: 1.6; margin-bottom: 20px;">${lesson.content}</p>
+                            </div>
+                        </div>
+                        
+                        ${lesson.codeExample ? `
+                        <div class="content-section">
+                            <div class="content-section-header">
+                                <span class="section-title">
+                                    <span class="icon">💻</span>
+                                    Code Example
+                                </span>
+                            </div>
+                            <div class="content-section-body">
+                                <div class="code-block">${escapeHtml(lesson.codeExample)}</div>
+                            </div>
+                        </div>
+                        ` : ''}
+                        
+                        ${lesson.challenge ? `
+                        <div class="content-section">
+                            <div class="content-section-header">
+                                <span class="icon">🎯</span>
+                                Challenge
+                            </div>
+                            <div class="content-section-body">
+                                <div class="challenge-description">${lesson.challenge.description}</div>
+                                <div class="challenge-actions">
+                                    <button class="btn" id="runCodeBtn">▶️ Run Code</button>
+                                    <button class="btn" id="showSolutionBtn">💡 Show Solution</button>
+                                </div>
+                                <div class="loading" id="loading" style="display: none;">
+                                    <div class="spinner"></div>
+                                    <p>Running your code...</p>
+                                </div>
+                                <div id="testResults"></div>
+                            </div>
+                        </div>
+                        ` : ''}
+                        
+                        <div class="content-section">
+                            <div class="content-section-header">
+                                <span class="section-title">
+                                    <span class="icon">🎥</span>
+                                    Video Tutorial
+                                </span>
+                            </div>
+                            <div class="content-section-body">
+                                <div class="video-container">
+                                    <div class="video-placeholder" id="videoPlaceholder">
+                                        <div class="video-placeholder-content">
+                                            <div class="video-icon">📺</div>
+                                            <h5>Video Tutorial</h5>
+                                            <p>Watch the concept explanation before coding</p>
+                                            <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+                                                <button class="btn btn-video" id="addVideoBtn">➕ Add Video Link</button>
+                                                <button class="btn btn-secondary" id="testVideoBtn">🧪 Test Video</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="video-player" id="videoPlayer" style="display: none;">
+                                        <div class="video-iframe-container">
+                                            <div class="video-loading" id="videoLoading">
+                                                <div class="spinner"></div>
+                                                <p>Loading video...</p>
+                                            </div>
+                                            <iframe id="youtubeFrame" width="100%" height="200" frameborder="0" allowfullscreen allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" style="display: none;"></iframe>
+                                        </div>
+                                        <div class="video-controls">
+                                            <button class="btn btn-secondary" id="changeVideoBtn">🔄 Change Video</button>
+                                            <button class="btn btn-secondary" id="removeVideoBtn">❌ Remove Video</button>
+                                            <button class="btn btn-secondary" id="clearCacheBtn">🗑️ Clear Cache</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            return content;
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        async function runCode() {
+            if (!currentLesson || !currentLesson.challenge) {
+                console.error('No current lesson or challenge');
+                return;
+            }
+
+            const code = getEditorCode();
+            const loading = document.getElementById('loading');
+            const results = document.getElementById('testResults');
+
+            if (!code.trim()) {
+                results.innerHTML = `
+                    <div class="test-results error">
+                        <h4>❌ Error</h4>
+                        <p>Please write some code before running!</p>
+                    </div>
+                `;
+                return;
+            }
+
+            loading.style.display = 'block';
+            results.innerHTML = '';
+
+            try {
+                const response = await fetch('/api/modules/execute', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        code: code,
+                        tests: currentLesson.challenge.tests,
+                        moduleId: currentModule ? currentModule.id : 'module-1',
+                        lessonId: currentLesson.id,
+                        userId: 'test_user'
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const result = await response.json();
+                console.log('Server response:', result); // Debug log
+                displayTestResults(result);
+            } catch (error) {
+                console.error('Error running code:', error);
+                results.innerHTML = `
+                    <div class="test-results error">
+                        <h4>❌ Error</h4>
+                        <p>Failed to execute code: ${error.message}</p>
+                    </div>
+                `;
+            } finally {
+                loading.style.display = 'none';
+            }
+        }
+
+        function displayTestResults(result) {
+            const results = document.getElementById('testResults');
+            
+            // Check if result and result.results exist
+            if (!result || !result.results || !Array.isArray(result.results)) {
+                results.innerHTML = `
+                    <div class="test-results error">
+                        <h4>❌ Error</h4>
+                        <p>Invalid test results received from server</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            let resultsHtml = '';
+            
+            // Header with points and level
+            if (result.points !== undefined) {
+                resultsHtml += `
+                    <div class="test-results ${result.success ? 'success' : 'error'}">
+                        <h4>🎯 ${result.message || 'Test Results'}</h4>
+                        <div class="score-section">
+                            <div class="score-item">
+                                <span class="score-label">🏆 Total Points:</span>
+                                <span class="score-value">${result.points}</span>
+                            </div>
+                            ${result.bonusPoints ? `<div class="score-item">
+                                <span class="score-label">🎁 Bonus Points:</span>
+                                <span class="score-value">+${result.bonusPoints}</span>
+                            </div>` : ''}
+                            ${result.level ? `<div class="score-item">
+                                <span class="score-label">📊 Level:</span>
+                                <span class="score-value">${result.level.name}</span>
+                            </div>` : ''}
+                        </div>
+                `;
+            }
+            
+            // Progress bar
+            if (result.progress) {
+                const progressWidth = result.progress.percentage || 0;
+                resultsHtml += `
+                    <div class="progress-section">
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: ${progressWidth}%"></div>
+                        </div>
+                        <p class="progress-text">${result.progress.passed}/${result.progress.total} tests passed (${progressWidth}%)</p>
+                    </div>
+                `;
+            }
+            
+            // Badges
+            if (result.badges && result.badges.length > 0) {
+                resultsHtml += `
+                    <div class="badges-section">
+                        <h5>🏅 Badges Earned:</h5>
+                        ${result.badges.map(badge => `
+                            <span class="badge">${badge.name} ${badge.description}</span>
+                        </span>
+                    `).join('')}
+                    </div>
+                `;
+            }
+            
+            // Test results
+            resultsHtml += `
+                <div class="tests-section">
+                    <h5>🧪 Test Results:</h5>
+                    ${result.results.map(test => `
+                        <div class="test-item">
+                            <span class="test-status ${test.passed ? 'passed' : 'failed'}">${test.passed ? '✅' : '❌'}</span>
+                            <div class="test-details">
+                                <span class="test-description">${test.description || 'Test'}</span>
+                                ${test.points ? `<span class="test-points">+${test.points} pts</span>` : ''}
+                                ${test.feedback ? `<div class="test-feedback">💡 ${test.feedback}</div>` : ''}
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+            
+            // Next challenge suggestion
+            if (result.nextChallenge) {
+                resultsHtml += `
+                    <div class="next-challenge">
+                        <h5>🚀 Next Challenge:</h5>
+                        <p>Ready for: <strong>${result.nextChallenge.title}</strong></p>
+                        <button class="btn" onclick="openNextChallenge('${result.nextChallenge.module}')">Continue Learning</button>
+                    </div>
+                `;
+            }
+            
+            // Overall feedback
+            if (result.feedback) {
+                resultsHtml += `
+                    <div class="feedback-section">
+                        <h5>💬 Feedback:</h5>
+                        <p>${result.feedback}</p>
+                    </div>
+                `;
+            }
+            
+            resultsHtml += '</div>';
+            results.innerHTML = resultsHtml;
+        }
+
+        function showSolution() {
+            console.log('Show Solution button clicked!');
+            console.log('Current lesson:', currentLesson);
+            
+            if (!currentLesson) {
+                console.log('No current lesson found');
+                return;
+            }
+            
+            if (!currentLesson.challenge) {
+                console.log('No challenge found, creating default challenge');
+                // Create a default challenge if none exists
+                currentLesson.challenge = {
+                    description: 'Complete the coding challenge above',
+                    starterCode: '// Your solution here'
+                };
+            }
+            
+            // Switch to solution-view tab
+            const solutionTab = document.querySelector('[data-tab="solution-view"]');
+            console.log('Solution tab found:', solutionTab);
+            
+            if (solutionTab) {
+                // Remove active class from all tabs
+                document.querySelectorAll('.file-tab').forEach(t => t.classList.remove('active'));
+                // Add active class to solution tab
+                solutionTab.classList.add('active');
+                // Switch content
+                switchTabContent('solution-view');
+                console.log('Switched to solution view tab');
+            } else {
+                console.log('Solution tab not found!');
+            }
+        }
+
+        function openNextChallenge(moduleId) {
+            // Find the module and open it
+            fetch('/api/modules')
+                .then(response => response.json())
+                .then(modules => {
+                    const module = modules.find(m => m.id === moduleId);
+                    if (module && module.lessons.length > 0) {
+                        openModule(module);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error opening next challenge:', error);
+                });
+        }
+
+        function closeLesson() {
+            document.getElementById('lessonModal').style.display = 'none';
+            document.body.style.overflow = 'auto';
+            currentLesson = null;
+        }
+
+        // Video functionality
+        function setupVideoFunctionality() {
+            const addVideoBtn = document.getElementById('addVideoBtn');
+            const testVideoBtn = document.getElementById('testVideoBtn');
+            const changeVideoBtn = document.getElementById('changeVideoBtn');
+            const removeVideoBtn = document.getElementById('removeVideoBtn');
+            const clearCacheBtn = document.getElementById('clearCacheBtn');
+            
+            if (addVideoBtn) {
+                addVideoBtn.addEventListener('click', showVideoInput);
+            }
+            
+            if (testVideoBtn) {
+                testVideoBtn.addEventListener('click', addTestVideo);
+            }
+            
+            if (changeVideoBtn) {
+                changeVideoBtn.addEventListener('click', showVideoInput);
+            }
+            
+            if (removeVideoBtn) {
+                removeVideoBtn.addEventListener('click', removeVideo);
+            }
+            
+            if (clearCacheBtn) {
+                clearCacheBtn.addEventListener('click', clearVideoCache);
+            }
+        }
+        
+        function showVideoInput() {
+            // Check if there's already a video playing
+            const videoPlayer = document.getElementById('videoPlayer');
+            const isVideoPlaying = videoPlayer && videoPlayer.style.display !== 'none';
+            
+            let promptText = 'Enter YouTube video URL:';
+            if (isVideoPlaying) {
+                promptText = 'Enter new YouTube video URL (this will replace the current video):';
+            }
+            
+            const videoUrl = prompt(promptText, '');
+            if (videoUrl && videoUrl.trim()) {
+                // Clear the current video first, then add the new one
+                clearVideoCache();
+                addVideo(videoUrl.trim());
+            }
+        }
+        
+        // Test function to add video directly
+        function addTestVideo() {
+            // Clear any existing video first
+            clearVideoCache();
+            // Add the new video
+            addVideo('https://www.youtube.com/watch?v=SccSCuHhOw0');
+        }
+        
+        // Function to clear video cache
+        function clearVideoCache() {
+            if (currentLesson) {
+                // Remove from localStorage
+                localStorage.removeItem(`video_${currentLesson.id}`);
+                
+                // Clear the current video display
+                const videoPlaceholder = document.getElementById('videoPlaceholder');
+                const videoPlayer = document.getElementById('videoPlayer');
+                
+                if (videoPlaceholder && videoPlayer) {
+                    // Show placeholder and hide video
+                    videoPlayer.style.display = 'none';
+                    videoPlaceholder.style.display = 'block';
+                }
+                
+                console.log('Video cache cleared for lesson:', currentLesson.id);
+            }
+        }
+        
+        function addVideo(videoUrl) {
+            console.log('Adding video:', videoUrl); // Debug log
+            
+            const videoId = extractYouTubeId(videoUrl);
+            console.log('Extracted video ID:', videoId); // Debug log
+            
+            if (videoId) {
+                // Wait a bit for DOM to be ready if elements aren't found immediately
+                const maxAttempts = 10;
+                let attempts = 0;
+                
+                const tryToAddVideo = () => {
+                    const videoPlaceholder = document.getElementById('videoPlaceholder');
+                    const videoPlayer = document.getElementById('videoPlayer');
+                    const youtubeFrame = document.getElementById('youtubeFrame');
+                    
+                    console.log('Video elements found (attempt', attempts + 1, '):', { // Debug log
+                        videoPlaceholder: !!videoPlaceholder,
+                        videoPlayer: !!videoPlayer,
+                        youtubeFrame: !!youtubeFrame
+                    });
+                    
+                    if (videoPlaceholder && videoPlayer && youtubeFrame) {
+                        // Set the YouTube embed URL
+                        const embedUrl = `https://www.youtube.com/embed/${videoId}?rel=0&modestbranding=1`;
+                        console.log('Setting embed URL:', embedUrl); // Debug log
+                        
+                        // Create a new iframe to ensure proper loading
+                        const newIframe = document.createElement('iframe');
+                        newIframe.src = embedUrl;
+                        newIframe.width = '100%';
+                        newIframe.height = '315';
+                        newIframe.frameBorder = '0';
+                        newIframe.allowFullscreen = true;
+                        newIframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
+                        newIframe.title = 'YouTube video player';
+                        
+                        // Replace the old iframe
+                        const iframeContainer = document.querySelector('.video-iframe-container');
+                        if (iframeContainer) {
+                            // Clear the container completely
+                            iframeContainer.innerHTML = '';
+                            
+                            // Add the new iframe directly
+                            iframeContainer.appendChild(newIframe);
+                            
+                            // Add error handling for iframe
+                            newIframe.onerror = function() {
+                                console.error('Iframe failed to load');
+                                showNotification('❌ Video failed to load. Please try again.', 'error');
+                            };
+                            
+                            // Add load event to show iframe
+                            newIframe.onload = function() {
+                                console.log('Video iframe loaded successfully');
+                                newIframe.style.display = 'block';
+                            };
+                            
+                            // Show iframe immediately (no loading state needed for replacement)
+                            newIframe.style.display = 'block';
+                        }
+                        
+                        // Hide placeholder and show video
+                        videoPlaceholder.style.display = 'none';
+                        videoPlayer.style.display = 'block';
+                        
+                        // Save video to localStorage for persistence
+                        localStorage.setItem(`video_${currentLesson.id}`, videoUrl);
+                        
+                        // Show success message
+                        showNotification('✅ Video added successfully!', 'success');
+                        
+                        console.log('Video added successfully!'); // Debug log
+                        return true; // Success
+                    } else {
+                        attempts++;
+                        if (attempts < maxAttempts) {
+                            console.log('Video elements not found, retrying in 100ms... (attempt', attempts, '/', maxAttempts, ')');
+                            setTimeout(tryToAddVideo, 100);
+                        } else {
+                            console.error('Failed to find video elements after', maxAttempts, 'attempts');
+                            showNotification('❌ Error: Video elements not found after multiple attempts. Please refresh the page.', 'error');
+                        }
+                        return false; // Failed
+                    }
+                };
+                
+                // Start the attempt
+                tryToAddVideo();
+                
+            } else {
+                console.error('Invalid YouTube URL:', videoUrl); // Debug log
+                showNotification('❌ Invalid YouTube URL. Please enter a valid YouTube link.', 'error');
+            }
+        }
+        
+        function removeVideo() {
+            const videoPlaceholder = document.getElementById('videoPlaceholder');
+            const videoPlayer = document.getElementById('videoPlayer');
+            const youtubeFrame = document.getElementById('youtubeFrame');
+            
+            if (videoPlaceholder && videoPlayer && youtubeFrame) {
+                // Clear the video source
+                youtubeFrame.src = '';
+                
+                // Show placeholder and hide video
+                videoPlayer.style.display = 'none';
+                videoPlaceholder.style.display = 'block';
+                
+                // Remove from localStorage
+                localStorage.removeItem(`video_${currentLesson.id}`);
+                
+                // Show success message
+                showNotification('✅ Video removed successfully!', 'info');
+            }
+        }
+        
+        function extractYouTubeId(url) {
+            // Handle various YouTube URL formats
+            const patterns = [
+                /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\n?#]+)/,
+                /youtube\.com\/v\/([^&\n?#]+)/,
+                /youtube\.com\/watch\?.*v=([^&\n?#]+)/
+            ];
+            
+            for (const pattern of patterns) {
+                const match = url.match(pattern);
+                if (match) {
+                    return match[1];
+                }
+            }
+            
+            return null;
+        }
+        
+        function loadSavedVideo() {
+            if (currentLesson) {
+                const savedVideo = localStorage.getItem(`video_${currentLesson.id}`);
+                if (savedVideo) {
+                    addVideo(savedVideo);
+                }
+            }
+        }
+        
+        function showNotification(message, type = 'info') {
+            // Create notification element
+            const notification = document.createElement('div');
+            notification.className = `notification notification-${type}`;
+            notification.innerHTML = `
+                <div class="notification-content">
+                    <span class="notification-message">${message}</span>
+                    <button class="notification-close">&times;</button>
+                </div>
+            `;
+            
+            // Add to page
+            document.body.appendChild(notification);
+            
+            // Auto-remove after 4 seconds
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.parentNode.removeChild(notification);
+                }
+            }, 4000);
+            
+            // Close button functionality
+            const closeBtn = notification.querySelector('.notification-close');
+            if (closeBtn) {
+                closeBtn.addEventListener('click', () => {
+                    if (notification.parentNode) {
+                        notification.parentNode.removeChild(notification);
+                    }
+                });
+            }
+        }
+        
+        // Load saved video when lesson opens
+        function openLessonWithVideo(lesson) {
+            openLesson(lesson);
+            // Load saved video after a short delay to ensure DOM is ready
+            setTimeout(loadSavedVideo, 100);
+            // Initialize CodeMirror editor
+            setTimeout(initializeCodeMirror, 100);
+        }
+
+        // Get initial code for editor
+        function getInitialCode(lesson) {
+            if (!lesson) return '// Your code here';
+            
+            console.log('Getting initial code for lesson:', lesson.title);
+            
+            if (lesson.challenge && lesson.challenge.starterCode) {
+                console.log('Using challenge starter code');
+                return getStarterCode(lesson.challenge.starterCode);
+            }
+            
+            // Generate default starter code based on lesson content
+            if (lesson.content && lesson.content.toLowerCase().includes('express')) {
+                return `const express = require('express');
+const app = express();
+const PORT = 3000;
+
+// Middleware
+app.use(express.json());
+
+// TODO: Implement your solution here
+app.get('/', (req, res) => {
+    res.send('Hello World!');
+});
+
+app.listen(PORT, () => {
+    console.log(\`Server running on port \${PORT}\`);
+});`;
+            }
+            
+            return '// Write your solution here...';
+        }
+
+        // Get starter code without solution
+        function getStarterCode(starterCode) {
+            if (!starterCode) return '// TODO: Implement your solution here';
+            
+            // Remove solution parts and keep only the basic structure
+            return starterCode.replace(/\/\/ Solution.*$/gm, '// TODO: Implement your solution here')
+                             .replace(/\/\/ TODO:.*$/gm, '// TODO: Implement your solution here');
+        }
+
+        // Get solution code
+        function getSolutionCode() {
+            if (!currentLesson || !currentLesson.challenge) {
+                console.log('No current lesson or challenge found');
+                return '// No solution available for this challenge';
+            }
+            
+            console.log('Current lesson:', currentLesson.title);
+            console.log('Challenge:', currentLesson.challenge);
+            
+            // If there's a solution property, use it
+            if (currentLesson.challenge.solution) {
+                console.log('Using provided solution');
+                return currentLesson.challenge.solution;
+            }
+            
+            console.log('Generating sample solution');
+            // Otherwise, create a sample solution based on the challenge
+            return generateSampleSolution();
+        }
+
+        // Generate sample solution based on challenge description
+        function generateSampleSolution() {
+            if (!currentLesson || !currentLesson.challenge) {
+                return '// No challenge available';
+            }
+            
+            const description = currentLesson.challenge.description.toLowerCase();
+            
+            if (description.includes('express') && description.includes('server')) {
+                return `const express = require('express');
+const app = express();
+const PORT = 3000;
+
+// Middleware
+app.use(express.json());
+
+// Routes
+app.get('/', (req, res) => {
+    res.send('Hello World!');
+});
+
+app.post('/api/login', async (req, res) => {
+    try {
+        const { email, password } = req.body;
+        
+        // TODO: Add your authentication logic here
+        // Example: Check user credentials, validate input, etc.
+        
+        res.json({ message: 'Login endpoint ready for implementation' });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+app.listen(PORT, () => {
+    console.log(\`Server running on port \${PORT}\`);
+});`;
+            }
+            
+            if (description.includes('jwt') || description.includes('authentication')) {
+                return `const jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt');
+
+// JWT Authentication Example
+const authenticateUser = async (req, res) => {
+    try {
+        const { email, password } = req.body;
+        
+        // TODO: Implement user validation
+        // 1. Find user in database
+        // 2. Compare password hash
+        // 3. Generate JWT token
+        // 4. Return token and user info
+        
+        const token = jwt.sign(
+            { userId: 'user_id', email: email },
+            process.env.JWT_SECRET || 'your-secret-key',
+            { expiresIn: '24h' }
+        );
+        
+        res.json({ token, message: 'Authentication ready for implementation' });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};`;
+            }
+            
+            // Default solution template
+            return `// Sample Solution for: ${currentLesson.challenge.description}
+
+// TODO: Implement your solution here
+// This is a template - customize it based on your specific challenge
+
+function solveChallenge() {
+    // Your implementation goes here
+    console.log('Challenge solution ready for implementation');
+}
+
+// Export or call your function
+module.exports = solveChallenge;`;
+        }
+
+        // Get test code
+        function getTestCode() {
+            if (!currentLesson || !currentLesson.challenge) {
+                return '// No tests available for this challenge';
+            }
+            
+            // If there are test cases, use them
+            if (currentLesson.challenge.tests && currentLesson.challenge.tests.length > 0) {
+                return currentLesson.challenge.tests.map(test => 
+                    `// Test: ${test.description}\n// Expected: ${test.expected}\n// Status: ${test.passed ? 'PASS' : 'FAIL'}\n`
+                ).join('\n');
+            }
+            
+            // Generate sample test cases
+            return `// Sample Test Cases for: ${currentLesson.challenge.description}
+
+// Test 1: Basic functionality
+console.log('Test 1: Basic functionality');
+// TODO: Add your test logic here
+
+// Test 2: Edge cases
+console.log('Test 2: Edge cases');
+// TODO: Add edge case testing
+
+// Test 3: Error handling
+console.log('Test 3: Error handling');
+// TODO: Add error case testing
+
+// Run tests
+console.log('\\nRunning tests...');
+// TODO: Execute your tests here`;
+        }
+
+        // Initialize CodeMirror editor
+        function initializeCodeMirror() {
+            const codeEditor = document.getElementById('codeEditor');
+            if (codeEditor && typeof CodeMirror !== 'undefined') {
+                // Hide the original textarea
+                codeEditor.style.display = 'none';
+                
+                // Initialize CodeMirror
+                const editor = CodeMirror.fromTextArea(codeEditor, {
+                    mode: 'javascript',
+                    theme: 'monokai',
+                    lineNumbers: true,
+                    autoCloseBrackets: true,
+                    matchBrackets: true,
+                    indentUnit: 4,
+                    tabSize: 4,
+                    indentWithTabs: false,
+                    lineWrapping: false,
+                    foldGutter: true,
+                    gutters: ['CodeMirror-linenumbers'],
+                    extraKeys: {
+                        'Tab': function(cm) {
+                            cm.replaceSelection('    ', 'end');
+                        }
+                    }
+                });
+                
+                // Store editor reference for later use
+                window.currentEditor = editor;
+                
+                // Set initial content
+                editor.setValue(codeEditor.value);
+                
+                // Refresh editor to ensure proper rendering
+                setTimeout(() => editor.refresh(), 100);
+                
+                // Setup tab switching
+                setupTabSwitching();
+            }
+        }
+
+        // Setup tab switching functionality
+        function setupTabSwitching() {
+            const tabs = document.querySelectorAll('.file-tab');
+            tabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    // Remove active class from all tabs
+                    tabs.forEach(t => t.classList.remove('active'));
+                    // Add active class to clicked tab
+                    this.classList.add('active');
+                    
+                    // Handle tab content switching
+                    const tabType = this.getAttribute('data-tab');
+                    switchTabContent(tabType);
+                });
+            });
+        }
+
+        // Switch tab content
+        function switchTabContent(tabType) {
+            if (!window.currentEditor) return;
+            
+            const readOnlyIndicator = document.getElementById('readOnlyIndicator');
+            
+            switch(tabType) {
+                case 'solution':
+                    // Show editable solution area
+                    const initialCode = getInitialCode(currentLesson);
+                    window.currentEditor.setValue(initialCode);
+                    window.currentEditor.setOption('readOnly', false);
+                    if (readOnlyIndicator) readOnlyIndicator.classList.remove('show');
+                    break;
+                case 'solution-view':
+                    // Show read-only solution
+                    const solution = getSolutionCode();
+                    window.currentEditor.setValue(solution);
+                    window.currentEditor.setOption('readOnly', true);
+                    if (readOnlyIndicator) readOnlyIndicator.classList.add('show');
+                    break;
+                case 'test':
+                    // Show test cases
+                    const testCode = getTestCode();
+                    window.currentEditor.setValue(testCode);
+                    window.currentEditor.setOption('readOnly', true);
+                    if (readOnlyIndicator) readOnlyIndicator.classList.add('show');
+                    break;
+            }
+        }
+
+        // Get code from editor (works with both textarea and CodeMirror)
+        function getEditorCode() {
+            if (window.currentEditor) {
+                return window.currentEditor.getValue();
+            }
+            const codeEditor = document.getElementById('codeEditor');
+            return codeEditor ? codeEditor.value : '';
+        }
+        
+        // Close modal when clicking outside
+        document.getElementById('lessonModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeLesson();
+            }
+        });
+    </script>
+</body>
+</html>
